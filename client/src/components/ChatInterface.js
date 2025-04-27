@@ -333,7 +333,7 @@ function ChatInterface() {
   const lastMessageRef = useRef(null);
   const recognitionRef = useRef(null);
 
-  const API_URL = 'http://127.0.0.1:5020';
+  const API_URL = 'https://instamart-bq8h.onrender.com';
   const ANSWER_ENDPOINT = `${API_URL}/api/answer`;
 
   const brandColor = '#fe5005';
