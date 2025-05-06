@@ -232,7 +232,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSmartphone, FiLogIn } from 'react-icons/fi';
 import { useSession } from '../hooks/useSession'; // adjust path as needed
-
+import { API_URL } from '../utils/constants';
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
@@ -247,7 +247,7 @@ const Login = () => {
     setTimeout(async () => {
       if (phoneNumber === '9849366500') {
         try {
-          const response = await fetch('/api/session/new', {
+          const response = await fetch(`${API_URL}/api/session/new`, {
             method: 'POST',
             credentials: 'include',
           });
