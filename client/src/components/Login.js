@@ -231,47 +231,37 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSmartphone, FiLogIn } from 'react-icons/fi';
-import { useSession } from '../hooks/useSession'; // adjust path as needed
-import { API_URL } from '../utils/constants';
+import { createNewSession } from '../api/chatApi';
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { setCurrentSessionId } = useSession(); // <-- session handler
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+  
     setTimeout(async () => {
       if (phoneNumber === '9849366500') {
+        // 👇 Call the new session API here
         try {
-          const response = await fetch(`${API_URL}/api/session/new`, {
-            method: 'POST',
-            credentials: 'include',
-          });
-
-          if (!response.ok) throw new Error('Failed to create session');
-
-          const data = await response.json();
-
-          // ✅ Store session ID
-          setCurrentSessionId(data.session_id);
-
-          // ✅ Redirect to chat
-          navigate('/chat');
-        } catch (err) {
-          console.error('Error creating session:', err);
-          setError('Something went wrong while creating session.');
+          const data = await createNewSession();
+          console.log('New session created:', data.session_id);
+          // Optional: store sessionId in localStorage or sessionStorage if needed
+          localStorage.setItem('session_id', data.session_id);
+        } catch (error) {
+          console.error('Failed to create session:', error);
         }
+  
+        navigate('/chat');
       } else {
         setError('Invalid phone number. Try "9849366500".');
       }
-
       setIsSubmitting(false);
     }, 800);
   };
+  
 
   return (
     <div style={styles.container}>
