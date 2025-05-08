@@ -34,6 +34,20 @@ class Config:
     MONGODB_DB_NAME = "ChatHistory"
     SESSION_COLLECTION = "chat_sessions"
     MEMORY_COLLECTION = "chat_memory"
+    DOC_COLLECTION="pdffile"
     
     # Conversation Limits
     MAX_CONVERSATION_LENGTH = 25
+
+
+    # DATASTAX_SESSION_ID = "instamart-session-001"
+    # DATASTAX_KEYSPACE = "Instamart"
+    # DATASTAX_TABLE = "HRMS_DOCS"
+    # DATASTAX_SECURE_BUNDLE_PATH = os.path.abspath("./secure-connect-instamart")
+    # DATASTAX_USERNAME = "afWAnMzfhIfCipocFZFtdUyC"  # Your Astra DB username
+    # DATASTAX_PASSWORD = "mBiGN-F-H4B-czBRQ.HnIZAuLFTO8IEQdFkBWtyrB1Ptb-G25R.F8E5gd.WbLgGcNojwHl+gep,TWg-chi17ZenpdWbkPezHDg7egkLcGBjZkFH7N7oaO5ob-AEJ9nQW"
+    ASTRA_DB_APPLICATION_TOKEN = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
+    ASTRA_DB_API_ENDPOINT = os.getenv("ASTRA_DB_API_ENDPOINT")
+    ASTRA_DB_KEYSPACE = os.getenv("ASTRA_DB_KEYSPACE")
+
+

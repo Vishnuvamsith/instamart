@@ -32,23 +32,41 @@ class LLMChainFactory:
 
         llm = self.create_llm()
         
+        # if memory:
+        #     prompt = ChatPromptTemplate.from_messages([
+        #         ("system", system_prompt),
+        #         MessagesPlaceholder(variable_name="chat_history"),
+        #         ("human", "Question: {question}\nContext: {context}")
+        #     ])
+            
+        #     chain = (
+        #         {
+        #             "question": RunnablePassthrough(),
+        #             "context": lambda x: "\n\n".join([doc.page_content for doc in x["docs"]]),
+        #             "chat_history": lambda x: x["chat_history"]
+        #         }
+        #         | prompt
+        #         | llm
+        #     )
+            
+        #     return chain
         if memory:
             prompt = ChatPromptTemplate.from_messages([
                 ("system", system_prompt),
                 MessagesPlaceholder(variable_name="chat_history"),
                 ("human", "Question: {question}\nContext: {context}")
             ])
-            
+
             chain = (
                 {
-                    "question": RunnablePassthrough(),
-                    "context": lambda x: "\n\n".join([doc.page_content for doc in x["docs"]]),
-                    "chat_history": lambda x: x["chat_history"]
+                "question": RunnablePassthrough(),
+                "context": lambda x: "\n\n".join([doc["text"] for doc in x["docs"]]),
+                "chat_history": lambda x: x["chat_history"]
                 }
-                | prompt
-                | llm
-            )
-            
+        | prompt
+        | llm
+        )
+
             return chain
         else:
             prompt = PromptTemplate(

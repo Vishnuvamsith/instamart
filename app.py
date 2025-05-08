@@ -592,14 +592,21 @@ import logging
 from datetime import datetime
 import os
 from io import BytesIO
-
-
+from models import PdfFile
+from mongoengine import connect
+from dotenv import load_dotenv
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize Flask
 app = Flask(__name__)
+load_dotenv()
+connect(
+    db=Config.MONGODB_DB_NAME,
+    host=Config.MONGODB_URI,
+    alias='default'  # Make sure MongoEngine uses the correct connection
+)
 CORS(app, supports_credentials=True)
 app.config.from_object(Config)
 
@@ -610,7 +617,40 @@ class CustomSessionInterface(SecureCookieSessionInterface):
             return super().save_session(*args, **kwargs)
 
 app.session_interface = CustomSessionInterface()
+@app.route('/api/upload', methods=['POST'])
+def upload_pdf():
+    try:
+        files = request.files.getlist("files")
+        if not files:
+            return jsonify({"status": "error", "message": "No files uploaded"}), 400
 
+        saved_files = []
+        print(1)
+
+        for file in files:
+            print(11)
+            # Check if file already exists in MongoDB
+            existing = PdfFile.objects(filename=file.filename).first()
+            print(2)
+            if existing:
+                continue  # Skip duplicates
+
+            # Save the file binary to MongoDB
+            pdf_file = PdfFile(
+                filename=file.filename,
+                content_type=file.content_type,
+                data=file.read()
+            ).save()
+            print(3)
+            # Process PDF from binary and store vectors in MongoDB
+            document_processor.process_and_store(BytesIO(pdf_file.data))
+            print(4)
+            saved_files.append(file.filename)
+
+        return jsonify({"status": "success", "files": saved_files}), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 # API Routes
 @app.route('/api/upload-pdfs', methods=['POST'])
 def upload_pdfs():
@@ -673,9 +713,10 @@ async def generate_answer():
         translated_question, original_lang = await translation_service.detect_and_translate(question)
         
         # Vector store search
-        vector_store_path = os.path.join(Config.VECTOR_STORE_FOLDER, "faiss_index")
-        new_db = vector_store_manager.load_vector_store(vector_store_path)
-        docs = new_db.similarity_search(translated_question, k=3)
+        # vector_store_path = os.path.join(Config.VECTOR_STORE_FOLDER, "faiss_index")
+        # new_db = vector_store_manager.load_vector_store(vector_store_path)
+        # docs = new_db.similarity_search(translated_question, k=3)
+        docs = vector_store_manager.semantic_search(translated_question, k=3)
         
         # Generate response
         chain = llm_chain_factory.create_llm_chain(memory)

@@ -18,3 +18,6 @@ gunicorn
 pymongo
 langchain-mongodb
 flask[async]
+mongoengine
+langchain_astradb
+astrapy
