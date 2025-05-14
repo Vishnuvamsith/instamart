@@ -607,7 +607,12 @@ connect(
     host=Config.MONGODB_URI,
     alias='default'  # Make sure MongoEngine uses the correct connection
 )
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=[
+    "http://localhost:3000", 
+    "http://localhost:3001", # Dev frontend
+    "https://instamart-alpha.vercel.app"  # Prod frontend
+])
+
 app.config.from_object(Config)
 
 # Custom session interface
@@ -651,6 +656,24 @@ def upload_pdf():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+@app.route('/api/pdf/count', methods=['GET'])
+def get_pdf_count():
+    try:
+        count = PdfFile.objects.count()
+        return jsonify({"status": "success", "totalDocuments": count}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+# Assuming PdfFile is your MongoEngine model
+@app.route('/api/documents', methods=['GET'])
+def list_documents():
+    try:
+        files = PdfFile.objects.only('filename')  # fetch just the filenames
+        filenames = [file.filename for file in files]
+        return jsonify({"status": "success", "files": filenames}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 # API Routes
 @app.route('/api/upload-pdfs', methods=['POST'])
 def upload_pdfs():
