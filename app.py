@@ -710,7 +710,7 @@ def upload_pdfs():
         return jsonify({"error": f"Failed to create vector store: {str(e)}"}), 500
 
 @app.route('/api/answer', methods=['POST'])
-async def generate_answer():
+def generate_answer():
     try:
         data = request.get_json()
         question = data.get('question')
@@ -733,7 +733,8 @@ async def generate_answer():
         print(memory)
         
         # Translation
-        translated_question, original_lang = await translation_service.detect_and_translate(question)
+        # translated_question, original_lang = await translation_service.detect_and_translate(question)
+        translated_question, original_lang = translation_service.detect_and_translate(question)
         
         # Vector store search
         # vector_store_path = os.path.join(Config.VECTOR_STORE_FOLDER, "faiss_index")
@@ -760,7 +761,8 @@ async def generate_answer():
             answer = response
         
         # Translate response
-        translated_answer = await translation_service.translate_back(answer, original_lang)
+        # translated_answer = await translation_service.translate_back(answer, original_lang)
+        translated_answer = translation_service.translate_back(answer, original_lang)
         
         # Store the interaction
         memory.save_context(
