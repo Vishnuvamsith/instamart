@@ -52,6 +52,7 @@ import {
       headers: {
         'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({ 
         question: message,
         session_id: sessionId
