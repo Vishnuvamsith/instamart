@@ -614,7 +614,6 @@ logger = logging.getLogger(__name__)
 # Initialize Flask
 app = Flask(__name__)
 load_dotenv()
-print(os.getnv("AWS_REGION"))
 # connect(
 #     db=Config.MONGODB_DB_NAME,
 #     host=Config.MONGODB_URI,
