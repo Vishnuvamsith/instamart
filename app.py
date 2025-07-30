@@ -980,114 +980,114 @@ def list_documents():
 #             'status': 'error',
 #             'message': 'An error occurred while processing your request'
 #         }), 500
-def create_support_ticket(user_info, question):
-    db_manager.get_collection("support_tickets").insert_one({
-        "question": question,
-        "user_name": user_info.get("name") or "Anonymous",
-        "user_phone": user_info.get("Phone_no"),
-        "created_at": datetime.utcnow(),
-        "status": "open",
-        "forwarded": True,
-        "source": "chatbot",
-        "answer": ""
-    })
+# def create_support_ticket(user_info, question):
+#     db_manager.get_collection("support_tickets").insert_one({
+#         "question": question,
+#         "user_name": user_info.get("name") or "Anonymous",
+#         "user_phone": user_info.get("Phone_no"),
+#         "created_at": datetime.utcnow(),
+#         "status": "open",
+#         "forwarded": True,
+#         "source": "chatbot",
+#         "answer": ""
+#     })
 
 
-@app.route('/api/answer', methods=['POST'])
-@auth_manager.token_required
-def generate_answer():
-    try:
-        data = request.get_json()
-        question = data.get('question')
-        user_info = request.user
+# @app.route('/api/answer', methods=['POST'])
+# @auth_manager.token_required
+# def generate_answer():
+#     try:
+#         data = request.get_json()
+#         question = data.get('question')
+#         user_info = request.user
         
-        if not question or not isinstance(question, str):
-            return jsonify({"error": "Valid question is required"}), 400
+#         if not question or not isinstance(question, str):
+#             return jsonify({"error": "Valid question is required"}), 400
         
-        session_id = data.get('session_id')
-        print(session_id)
-        conv_length = db_manager.get_collection(Config.SESSION_COLLECTION).count_documents(
-            {"session_id": session_id}
-        )
+#         session_id = data.get('session_id')
+#         print(session_id)
+#         conv_length = db_manager.get_collection(Config.SESSION_COLLECTION).count_documents(
+#             {"session_id": session_id}
+#         )
         
-        if conv_length >= Config.MAX_CONVERSATION_LENGTH:
-            return jsonify({
-                'status': 'limit_reached',
-                'message': 'Conversation limit reached. Please start a new session.'
-            }), 200
+#         if conv_length >= Config.MAX_CONVERSATION_LENGTH:
+#             return jsonify({
+#                 'status': 'limit_reached',
+#                 'message': 'Conversation limit reached. Please start a new session.'
+#             }), 200
         
-        memory = memory_manager.get_memory_for_session(session_id)
-        print(memory)
+#         memory = memory_manager.get_memory_for_session(session_id)
+#         print(memory)
         
-        # Translation
-        # translated_question, original_lang = await translation_service.detect_and_translate(question)
-        translated_question, original_lang = translation_service.detect_and_translate(question)
+#         # Translation
+#         # translated_question, original_lang = await translation_service.detect_and_translate(question)
+#         translated_question, original_lang = translation_service.detect_and_translate(question)
         
-        # Vector store search
-        # vector_store_path = os.path.join(Config.VECTOR_STORE_FOLDER, "faiss_index")
-        # new_db = vector_store_manager.load_vector_store(vector_store_path)
-        # docs = new_db.similarity_search(translated_question, k=3)
-        docs = vector_store_manager.semantic_search(translated_question, k=3)
+#         # Vector store search
+#         # vector_store_path = os.path.join(Config.VECTOR_STORE_FOLDER, "faiss_index")
+#         # new_db = vector_store_manager.load_vector_store(vector_store_path)
+#         # docs = new_db.similarity_search(translated_question, k=3)
+#         docs = vector_store_manager.semantic_search(translated_question, k=3)
         
-        # Generate response
-        chain = llm_chain_factory.create_llm_chain(memory)
+#         # Generate response
+#         chain = llm_chain_factory.create_llm_chain(memory)
         
-        if memory:
-            inputs = {
-                "question": translated_question,
-                "docs": docs,
-                "chat_history": memory.chat_memory.messages
-            }
-            response = chain.invoke(inputs)
-            answer = response.content
-        else:
-            response = chain.run(
-                question=translated_question,
-                context="\n\n".join([doc.page_content for doc in docs])
-            )
-            answer = response
+#         if memory:
+#             inputs = {
+#                 "question": translated_question,
+#                 "docs": docs,
+#                 "chat_history": memory.chat_memory.messages
+#             }
+#             response = chain.invoke(inputs)
+#             answer = response.content
+#         else:
+#             response = chain.run(
+#                 question=translated_question,
+#                 context="\n\n".join([doc.page_content for doc in docs])
+#             )
+#             answer = response
         
-        # Translate response
-        # translated_answer = await translation_service.translate_back(answer, original_lang)
-        translated_answer = translation_service.translate_back(answer, original_lang)
+#         # Translate response
+#         # translated_answer = await translation_service.translate_back(answer, original_lang)
+#         translated_answer = translation_service.translate_back(answer, original_lang)
         
-        # Store the interaction
-        memory.save_context(
-            {"question": translated_question},
-            {"answer": translated_answer}
-        )
-        fallback_msg = "Your query has been forwarded to the concerned HR. Please wait for their reply."
-        if translated_answer.strip() == fallback_msg:
-            create_support_ticket(user_info, question)
+#         # Store the interaction
+#         memory.save_context(
+#             {"question": translated_question},
+#             {"answer": translated_answer}
+#         )
+#         fallback_msg = "Your query has been forwarded to the concerned HR. Please wait for their reply."
+#         if translated_answer.strip() == fallback_msg:
+#             create_support_ticket(user_info, question)
         
-        # Log session
-        db_manager.get_collection(Config.SESSION_COLLECTION).insert_one({
-            "session_id": session_id,
-            "timestamp": datetime.utcnow(),
-            "original_question": question,
-            "translated_question": translated_question,
-            "answer": translated_answer,
-            "language": original_lang,
-            "name": user_info.get('name'),
-            "Phone_no": user_info.get('Phone_no'),
-            "metadata": {
-                "user_agent": request.headers.get('User-Agent'),
-                "ip_address": request.remote_addr
-            }
-        })
+#         # Log session
+#         db_manager.get_collection(Config.SESSION_COLLECTION).insert_one({
+#             "session_id": session_id,
+#             "timestamp": datetime.utcnow(),
+#             "original_question": question,
+#             "translated_question": translated_question,
+#             "answer": translated_answer,
+#             "language": original_lang,
+#             "name": user_info.get('name'),
+#             "Phone_no": user_info.get('Phone_no'),
+#             "metadata": {
+#                 "user_agent": request.headers.get('User-Agent'),
+#                 "ip_address": request.remote_addr
+#             }
+#         })
         
-        return jsonify({
-            'status': 'success',
-            'response': {'answer': translated_answer},
-            'session_id': session_id
-        })
+#         return jsonify({
+#             'status': 'success',
+#             'response': {'answer': translated_answer},
+#             'session_id': session_id
+#         })
         
-    except Exception as e:
-        logger.error(f"API error: {str(e)}", exc_info=True)
-        return jsonify({
-            'status': 'error',
-            'message': 'An error occurred while processing your request'
-        }), 500
+#     except Exception as e:
+#         logger.error(f"API error: {str(e)}", exc_info=True)
+#         return jsonify({
+#             'status': 'error',
+#             'message': 'An error occurred while processing your request'
+#         }), 500
 
 @app.route('/api/dynamo/answer', methods=['POST'])
 @auth_manager.token_required
@@ -1538,17 +1538,17 @@ def getProfile():
             "message": "Internal server error",
             "error": str(e)
         }), 500
-def create_support_ticket(user_info, question):
-    db_manager.get_collection("support_tickets").insert_one({
-        "question": question,
-        "user_name": user_info.get("name") or "Anonymous",
-        "user_phone": user_info.get("Phone_no"),
-        "created_at": datetime.utcnow(),
-        "status": "open",
-        "forwarded": True,
-        "source": "chatbot",
-        "answer": ""
-    })
+# def create_support_ticket(user_info, question):
+#     db_manager.get_collection("support_tickets").insert_one({
+#         "question": question,
+#         "user_name": user_info.get("name") or "Anonymous",
+#         "user_phone": user_info.get("Phone_no"),
+#         "created_at": datetime.utcnow(),
+#         "status": "open",
+#         "forwarded": True,
+#         "source": "chatbot",
+#         "answer": ""
+#     })
 # @app.route('/api/addMood', methods=['POST'])
 # def add_mood():
 #     data = request.get_json()
