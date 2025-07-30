@@ -145,7 +145,6 @@ import pickle
 import uuid
 from datetime import datetime
 from config import Config
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from s3_manager import s3_manager
 from io import BytesIO
 import os
