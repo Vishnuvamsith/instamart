@@ -580,7 +580,7 @@
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from config import Config
-from database import db_manager
+# from database import db_manager
 from session_manager import session_manager
 from memory_manager import memory_manager
 from document_processor import document_processor
