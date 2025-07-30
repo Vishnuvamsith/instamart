@@ -72,8 +72,8 @@ class DynamoDBManager:
         try:
             print(self.config.AWS_REGION)
             # No profile_name — rely on IAM role or environment credentials
-            self.client = boto3.client("dynamodb", region_name=self.config.AWS_REGION)
-            self.resource = boto3.resource("dynamodb", region_name=self.config.AWS_REGION)
+            self.client = boto3.client("dynamodb", region_name="ap-southeast-1")
+            self.resource = boto3.resource("dynamodb", region_name="ap-southeast-1")
 
             self.client.list_tables()  # Verify connection
             logger.info("✅ DynamoDB connection established (IAM or environment-based)")
