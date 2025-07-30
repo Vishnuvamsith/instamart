@@ -622,7 +622,8 @@ load_dotenv()
 CORS(app, supports_credentials=True, expose_headers=['Authorization'],origins=[
     "http://localhost:3000", 
     "http://localhost:3001", # Dev frontend
-    "https://instamart-alpha.vercel.app"  # Prod frontend
+    "https://instamart-alpha.vercel.app" ,
+     "http://13.228.237.56:3000" # Prod frontend
 ])
 
 app.config.from_object(Config)
