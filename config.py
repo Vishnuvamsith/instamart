@@ -51,3 +51,26 @@ class Config:
     ASTRA_DB_KEYSPACE = os.getenv("ASTRA_DB_KEYSPACE")
 
 
+    LITELLM_ENDPOINT = "https://litellm.swiggyops.de"
+    CLAUDE_KEY = os.getenv("ANTHROPIC_API_KEY")
+    ANTHROPIC_MODEL_NAME = "bedrock-claude-3-7-sonnet"
+
+    AWS_REGION=os.getenv("AWS_REGION")
+    AWS_ACCESS_KEY_ID=os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY=os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_SESSION_TOKEN=os.getenv("AWS_SESSION_TOKEN")
+    AWS_PROFILE_NAME = "AWSSandboxAdmin-978983596161"
+
+
+    DYNAMO_SESSION_TABLE = "ChatSessions"
+    DYNAMO_MEMORY_TABLE = "ChatMemory"
+    DYNAMO_DOC_TABLE = "MetaData"
+    DYNAMO_PDF_TABLE="PDFDocuments"
+    DYNAMO_VECTOR_METADATA_TABLE="vector_meta_data"
+    DYNAMO_INSTAMART_USERS="InstamartUsers"
+
+
+    S3_BUCKET="imhrmsdocs"
+
+
+

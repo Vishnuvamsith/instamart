@@ -1,20 +1,29 @@
 // import React, { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 // import { FiSmartphone, FiLogIn } from 'react-icons/fi';
-
+// import { createNewSession } from '../api/chatApi';
 // const Login = () => {
 //   const [phoneNumber, setPhoneNumber] = useState('');
 //   const [error, setError] = useState('');
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const navigate = useNavigate();
 
-//   const handleSubmit = (e) => {
+//   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     setIsSubmitting(true);
-    
-//     // Simulate API call delay
-//     setTimeout(() => {
+  
+//     setTimeout(async () => {
 //       if (phoneNumber === '9849366500') {
+//         // 👇 Call the new session API here
+//         try {
+//           const data = await createNewSession();
+//           console.log('New session created:', data.session_id);
+//           // Optional: store sessionId in localStorage or sessionStorage if needed
+//           localStorage.setItem('session_id', data.session_id);
+//         } catch (error) {
+//           console.error('Failed to create session:', error);
+//         }
+  
 //         navigate('/chat');
 //       } else {
 //         setError('Invalid phone number. Try "9849366500".');
@@ -22,6 +31,7 @@
 //       setIsSubmitting(false);
 //     }, 800);
 //   };
+  
 
 //   return (
 //     <div style={styles.container}>
@@ -33,7 +43,7 @@
 //           <h2 style={styles.title}>HRMS Portal</h2>
 //           <p style={styles.subtitle}>Employee Access Portal</p>
 //         </div>
-        
+
 //         <form onSubmit={handleSubmit} style={styles.form}>
 //           <div style={styles.inputContainer}>
 //             <label style={styles.label}>Mobile Number</label>
@@ -53,15 +63,15 @@
 //               />
 //             </div>
 //           </div>
-          
+
 //           {error && (
 //             <div style={styles.errorContainer}>
 //               <p style={styles.errorText}>{error}</p>
 //             </div>
 //           )}
-          
-//           <button 
-//             type="submit" 
+
+//           <button
+//             type="submit"
 //             style={isSubmitting ? styles.buttonSubmitting : styles.button}
 //             disabled={isSubmitting}
 //           >
@@ -75,7 +85,7 @@
 //             )}
 //           </button>
 //         </form>
-        
+
 //         <div style={styles.footer}>
 //           <p style={styles.footerText}>Need help? Contact HR at hr@company.com</p>
 //         </div>
@@ -228,10 +238,14 @@
 
 // export default Login;
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSmartphone, FiLogIn } from 'react-icons/fi';
+import axios from 'axios';
 import { createNewSession } from '../api/chatApi';
+
+const Spinner = lazy(() => import('../components/Spinner'));
+
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
@@ -241,90 +255,50 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-  
-    setTimeout(async () => {
-      if (phoneNumber === '9849366500') {
-        // 👇 Call the new session API here
+    setError('');
+    try {
+      const response = await axios.post('http://127.0.0.1:5020/api/auth/login', {
+        Phone_no: phoneNumber  // No need to convert to Number
+      });
+      
+      const { token, user } = response.data;
+      if (token) {
+        // Store token and user data
+        localStorage.setItem('auth_token', token);
+        localStorage.setItem('user_data', JSON.stringify(user));
+        
+        // Set default headers for all axios requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
         try {
-          const data = await createNewSession();
-          console.log('New session created:', data.session_id);
-          // Optional: store sessionId in localStorage or sessionStorage if needed
-          localStorage.setItem('session_id', data.session_id);
+          // Create a new session and wait for it to complete
+          const sessionData = await createNewSession();
+          console.log('New session created:', sessionData.session_id);
+          
+          // Store sessionId in localStorage
+          if (sessionData && sessionData.session_id) {
+            localStorage.setItem('session_id', sessionData.session_id);
+          } else {
+            console.error('Session creation failed - no session ID returned');
+          }
+          
+          // Navigate to chat page after session is created
+          navigate('/mood');
         } catch (error) {
           console.error('Failed to create session:', error);
+          // Still navigate to chat page, the app will handle session creation there
+          navigate('/mood');
         }
-  
-        navigate('/chat');
       } else {
-        setError('Invalid phone number. Try "9849366500".');
+        setError('Authentication failed. Please try again.');
       }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
       setIsSubmitting(false);
-    }, 800);
+    }
   };
-  
-
-  return (
-    <div style={styles.container}>
-      <div style={styles.loginCard}>
-        <div style={styles.logoContainer}>
-          <div style={styles.logo}>
-            <FiSmartphone style={styles.logoIcon} />
-          </div>
-          <h2 style={styles.title}>HRMS Portal</h2>
-          <p style={styles.subtitle}>Employee Access Portal</p>
-        </div>
-
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.inputContainer}>
-            <label style={styles.label}>Mobile Number</label>
-            <div style={styles.inputWrapper}>
-              <span style={styles.countryCode}>+91</span>
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => {
-                  setError('');
-                  setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10));
-                }}
-                placeholder="Please enter your mobile number"
-                required
-                style={styles.input}
-                maxLength="10"
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div style={styles.errorContainer}>
-              <p style={styles.errorText}>{error}</p>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            style={isSubmitting ? styles.buttonSubmitting : styles.button}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              'Verifying...'
-            ) : (
-              <>
-                <FiLogIn style={styles.buttonIcon} />
-                <span>Login</span>
-              </>
-            )}
-          </button>
-        </form>
-
-        <div style={styles.footer}>
-          <p style={styles.footerText}>Need help? Contact HR at hr@company.com</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const styles = {
+  const styles = {
   container: {
     display: 'flex',
     justifyContent: 'center',
@@ -464,6 +438,65 @@ const styles = {
     color: '#64748b',
     margin: '0',
   },
+};
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.loginCard}>
+        <div style={styles.logoContainer}>
+          <div style={styles.logo}>
+            <FiSmartphone style={styles.logoIcon} />
+          </div>
+          <h2 style={styles.title}>HRMS Portal</h2>
+          <p style={styles.subtitle}>Employee Access Portal</p>
+        </div>
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.inputContainer}>
+            <label style={styles.label}>Mobile Number</label>
+            <div style={styles.inputWrapper}>
+              <span style={styles.countryCode}>+91</span>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => {
+                  setError('');
+                  setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10));
+                }}
+                placeholder="Please enter your mobile number"
+                required
+                style={styles.input}
+                maxLength="10"
+              />
+            </div>
+          </div>
+          {error && (
+            <div style={styles.errorContainer}>
+              <p style={styles.errorText}>{error}</p>
+            </div>
+          )}
+          <button
+            type="submit"
+            style={isSubmitting ? styles.buttonSubmitting : styles.button}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <Suspense fallback={<span>Verifying...</span>}>
+                <Spinner />
+              </Suspense>
+            ) : (
+              <>
+                <FiLogIn style={styles.buttonIcon} />
+                <span>Login</span>
+              </>
+            )}
+          </button>
+        </form>
+        <div style={styles.footer}>
+          <p style={styles.footerText}>Need help? Contact HR at hr@company.com</p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Login;

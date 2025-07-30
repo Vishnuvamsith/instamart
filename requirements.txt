@@ -21,3 +21,10 @@ flask[async]
 mongoengine
 langchain_astradb
 astrapy
+PyJWT
+openai
+boto3
+gspread
+oauth2client
+pandas
+redis

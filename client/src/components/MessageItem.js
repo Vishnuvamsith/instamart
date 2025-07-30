@@ -66,9 +66,11 @@ import { FaUser } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
 import { COLORS } from '../utils/constants';
 import swiggyLogo from '../assets/images/swiggyLogo.png'; // Swiggy logo import
+import { useTranslation } from 'react-i18next';
 
 const MessageItem = ({ message, index, isLastMessage, copiedIndex, onCopy, lastMessageRef }) => {
   const isUser = message.type === 'user';
+  const { t } = useTranslation();
 
   return (
     <div 
@@ -99,7 +101,7 @@ const MessageItem = ({ message, index, isLastMessage, copiedIndex, onCopy, lastM
             )}
           </div>
           <span className="font-semibold">
-            {isUser ? 'You' : 'Assistant'}
+            {isUser ? t("You") : t("Assistant")}
           </span>
         </div>
         

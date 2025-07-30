@@ -15,15 +15,21 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ChatInterface from './components/ChatInterface';
 import Login from './components/Login';
+import Mood from './components/MoodCheckin';
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/chat" element={<ChatInterface />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
-      </Routes>
+      <>
+        <Toaster position="top-center" reverseOrder={false} /> {/* Toast component */}
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/mood" element={<Mood />} />
+          <Route path="/chat" element={<ChatInterface />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </>
     </Router>
   );
 }

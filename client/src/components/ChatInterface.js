@@ -1371,7 +1371,285 @@
 // export default ChatInterface;
 
 
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
+// import { FaBars } from 'react-icons/fa';
+// import SessionSidebar from './SessionSidebar';
+// import Header from './Header';
+// import MessageList from './MessageList';
+// import InputArea from './InputArea';
+// import useSession from '../hooks/useSession';
+// import useChat from '../hooks/useChat';
+// import useSpeechRecognition from '../hooks/useSpeechRecognition';
+
+// function ChatInterface() {
+//   const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+//   const { 
+//     sessions,
+//     currentSessionId,
+//     conversations,
+//     setConversations,
+//     showWelcome,
+//     setShowWelcome,
+//     error,
+//     setError,
+//     loading,
+//     setLoading,
+//     refreshSessions,
+//     handleNewSession,
+//     handleDeleteSession,
+//     handleSelectSession
+//   } = useSession();
+  
+//   const {
+//     message,
+//     setMessage,
+//     copiedIndex,
+//     handleSubmit,
+//     handleCopy,
+//     handleKeyPress
+//   } = useChat(
+//     conversations, 
+//     setConversations, 
+//     currentSessionId, 
+//     setError, 
+//     setLoading, 
+//     setShowWelcome, 
+//     refreshSessions,
+//     handleNewSession // Added handleNewSession to useChat
+//   );
+  
+//   const { isRecording, toggleRecording } = useSpeechRecognition((transcript) => {
+//     setMessage(transcript);
+//     setShowWelcome(false);
+//   });
+  
+//   const toggleSidebar = () => {
+//     setSidebarOpen(!sidebarOpen);
+//   };
+
+//   return (
+//     <div className="flex h-screen bg-gray-50">
+//       {/* Mobile sidebar toggle */}
+//       <button 
+//         className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md"
+//         onClick={toggleSidebar}
+//       >
+//         <FaBars className="text-gray-600" />
+//       </button>
+
+//       {/* Sidebar */}
+//       <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+//         md:translate-x-0 transform transition-transform duration-200 ease-in-out 
+//         fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200`}
+//       >
+//         <SessionSidebar 
+//           sessions={sessions}
+//           onSelectSession={handleSelectSession}
+//           onCreateNew={handleNewSession}
+//           currentSessionId={currentSessionId}
+//           onDeleteSession={handleDeleteSession}
+//         />
+//       </div>
+
+//       {/* Overlay for mobile */}
+//       {sidebarOpen && (
+//         <div 
+//           className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+//           onClick={toggleSidebar}
+//         />
+//       )}
+
+//       {/* Main chat area */}
+//       <div className="flex-1 flex flex-col overflow-hidden">
+//         <Header toggleSidebar={toggleSidebar} />
+
+//         <div className="flex-grow overflow-hidden container mx-auto flex flex-col p-4">
+//           <div className="flex-grow overflow-y-auto mb-4 rounded-lg bg-white shadow-md border border-gray-100">
+//             <MessageList 
+//               conversations={conversations}
+//               showWelcome={showWelcome}
+//               loading={loading}
+//               copiedIndex={copiedIndex}
+//               handleCopy={handleCopy}
+//               setMessage={setMessage}
+//               handleSubmit={handleSubmit}
+//             />
+//           </div>
+
+//           <InputArea 
+//             message={message}
+//             setMessage={setMessage}
+//             handleSubmit={handleSubmit}
+//             handleKeyPress={handleKeyPress}
+//             isRecording={isRecording}
+//             toggleRecording={toggleRecording}
+//             loading={loading}
+//             error={error}
+//             conversations={conversations}
+//             onNewSession={handleNewSession}
+//           />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ChatInterface;
+
+// import React, { useState, useEffect, useCallback } from 'react';
+// import { FaBars } from 'react-icons/fa';
+// import SessionSidebar from './SessionSidebar';
+// import Header from './Header';
+// import MessageList from './MessageList';
+// import InputArea from './InputArea';
+// import useSession from '../hooks/useSession';
+// import useChat from '../hooks/useChat';
+// import useSpeechRecognition from '../hooks/useSpeechRecognition';
+
+// function ChatInterface() {
+//   const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+//   const {
+//     sessions,
+//     currentSessionId,
+//     conversations,
+//     setConversations,
+//     showWelcome,
+//     setShowWelcome,
+//     error,
+//     setError,
+//     loading,
+//     setLoading,
+//     refreshSessions,
+//     handleNewSession,
+//     handleDeleteSession,
+//     handleSelectSession
+//   } = useSession();
+  
+//   // Initialize chat with the proper session ID
+//   const {
+//     message,
+//     setMessage,
+//     copiedIndex,
+//     handleSubmit: originalHandleSubmit,
+//     handleCopy,
+//     handleKeyPress
+//   } = useChat(
+//     conversations, 
+//     setConversations, 
+//     currentSessionId, 
+//     setError, 
+//     setLoading, 
+//     setShowWelcome, 
+//     refreshSessions,
+//     handleNewSession
+//   );
+  
+//   // Wrap the handleSubmit to ensure we have a valid session ID
+//   const handleSubmit = useCallback(async (e) => {
+//     if (e) e.preventDefault();
+    
+//     // If no current session, create one first
+//     let sessionIdToUse = currentSessionId;
+    
+//     if (!sessionIdToUse) {
+//       console.log("No session ID found, creating new session before submitting message");
+//       try {
+//         sessionIdToUse = await handleNewSession();
+//         console.log("Created new session:", sessionIdToUse);
+//       } catch (err) {
+//         console.error("Failed to create session before submitting message:", err);
+//         setError({
+//           type: 'error',
+//           message: 'Failed to create chat session. Please try again.'
+//         });
+//         return;
+//       }
+//     }
+    
+//     // Now call the original submit handler
+//     return originalHandleSubmit(e, sessionIdToUse);
+//   }, [currentSessionId, originalHandleSubmit, handleNewSession, setError]);
+
+//   const { isRecording, toggleRecording } = useSpeechRecognition((transcript) => {
+//     setMessage(transcript);
+//     setShowWelcome(false);
+//   });
+  
+//   const toggleSidebar = () => {
+//     setSidebarOpen(!sidebarOpen);
+//   };
+
+//   return (
+//     <div className="flex h-screen bg-gray-50">
+//       {/* Mobile sidebar toggle */}
+//       <button 
+//         className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md"
+//         onClick={toggleSidebar}
+//       >
+//         <FaBars className="text-gray-600" />
+//       </button>
+      
+//       {/* Sidebar */}
+//       <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+//         md:translate-x-0 transform transition-transform duration-200 ease-in-out 
+//         fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200`}
+//       >
+//         <SessionSidebar 
+//           sessions={sessions}
+//           onSelectSession={handleSelectSession}
+//           onCreateNew={handleNewSession}
+//           currentSessionId={currentSessionId}
+//           onDeleteSession={handleDeleteSession}
+//         />
+//       </div>
+      
+//       {/* Overlay for mobile */}
+//       {sidebarOpen && (
+//         <div 
+//           className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+//           onClick={toggleSidebar}
+//         />
+//       )}
+      
+//       {/* Main chat area */}
+//       <div className="flex-1 flex flex-col overflow-hidden">
+//         <Header toggleSidebar={toggleSidebar} />
+//         <div className="flex-grow overflow-hidden container mx-auto flex flex-col p-4">
+//           <div className="flex-grow overflow-y-auto mb-4 rounded-lg bg-white shadow-md border border-gray-100">
+//             <MessageList 
+//               conversations={conversations}
+//               showWelcome={showWelcome}
+//               loading={loading}
+//               copiedIndex={copiedIndex}
+//               handleCopy={handleCopy}
+//               setMessage={setMessage}
+//               handleSubmit={handleSubmit}
+//             />
+//           </div>
+//           <InputArea 
+//             message={message}
+//             setMessage={setMessage}
+//             handleSubmit={handleSubmit}
+//             handleKeyPress={handleKeyPress}
+//             isRecording={isRecording}
+//             toggleRecording={toggleRecording}
+//             loading={loading}
+//             error={error}
+//             conversations={conversations}
+//             onNewSession={handleNewSession}
+//           />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ChatInterface;
+
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaBars } from 'react-icons/fa';
 import SessionSidebar from './SessionSidebar';
 import Header from './Header';
@@ -1381,10 +1659,20 @@ import useSession from '../hooks/useSession';
 import useChat from '../hooks/useChat';
 import useSpeechRecognition from '../hooks/useSpeechRecognition';
 
+// NEW: Import modal components
+import ProfileModal from './ProfileModal';
+import SettingsModal from './SettingsModal';
+import SupportTicketsModal from './SupportTicketsModal';
+
 function ChatInterface() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  
-  const { 
+
+  // NEW: Modal state
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showTicketsModal, setShowTicketsModal] = useState(false);
+
+  const {
     sessions,
     currentSessionId,
     conversations,
@@ -1400,33 +1688,47 @@ function ChatInterface() {
     handleDeleteSession,
     handleSelectSession
   } = useSession();
-  
+
   const {
     message,
     setMessage,
     copiedIndex,
-    handleSubmit,
+    handleSubmit: originalHandleSubmit,
     handleCopy,
     handleKeyPress
   } = useChat(
-    conversations, 
-    setConversations, 
-    currentSessionId, 
-    setError, 
-    setLoading, 
-    setShowWelcome, 
+    conversations,
+    setConversations,
+    currentSessionId,
+    setError,
+    setLoading,
+    setShowWelcome,
     refreshSessions,
-    handleNewSession // Added handleNewSession to useChat
+    handleNewSession
   );
-  
+
+  const handleSubmit = useCallback(async (e) => {
+    if (e) e.preventDefault();
+    let sessionIdToUse = currentSessionId;
+
+    if (!sessionIdToUse) {
+      try {
+        sessionIdToUse = await handleNewSession();
+      } catch (err) {
+        setError({ type: 'error', message: 'Failed to create chat session. Please try again.' });
+        return;
+      }
+    }
+
+    return originalHandleSubmit(e, sessionIdToUse);
+  }, [currentSessionId, originalHandleSubmit, handleNewSession, setError]);
+
   const { isRecording, toggleRecording } = useSpeechRecognition((transcript) => {
     setMessage(transcript);
     setShowWelcome(false);
   });
-  
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -1449,6 +1751,11 @@ function ChatInterface() {
           onCreateNew={handleNewSession}
           currentSessionId={currentSessionId}
           onDeleteSession={handleDeleteSession}
+
+          // NEW: handlers passed to Sidebar
+          onShowProfile={() => setShowProfileModal(true)}
+          onShowSettings={() => setShowSettingsModal(true)}
+          onShowTickets={() => setShowTicketsModal(true)}
         />
       </div>
 
@@ -1460,10 +1767,9 @@ function ChatInterface() {
         />
       )}
 
-      {/* Main chat area */}
+      {/* Main Chat */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header toggleSidebar={toggleSidebar} />
-
         <div className="flex-grow overflow-hidden container mx-auto flex flex-col p-4">
           <div className="flex-grow overflow-y-auto mb-4 rounded-lg bg-white shadow-md border border-gray-100">
             <MessageList 
@@ -1476,7 +1782,6 @@ function ChatInterface() {
               handleSubmit={handleSubmit}
             />
           </div>
-
           <InputArea 
             message={message}
             setMessage={setMessage}
@@ -1491,6 +1796,11 @@ function ChatInterface() {
           />
         </div>
       </div>
+
+      {/* NEW: Modal Renderings */}
+      {showProfileModal && <ProfileModal onClose={() => setShowProfileModal(false)} />}
+      {showSettingsModal && <SettingsModal onClose={() => setShowSettingsModal(false)} />}
+      {showTicketsModal && <SupportTicketsModal onClose={() => setShowTicketsModal(false)} />}
     </div>
   );
 }

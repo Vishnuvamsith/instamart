@@ -3,6 +3,12 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import i18n from './i18n';
+
+const userSettings = JSON.parse(localStorage.getItem("user_settings"));
+if (userSettings?.language) {
+  i18n.changeLanguage(userSettings.language);
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

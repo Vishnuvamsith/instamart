@@ -141,6 +141,7 @@ import { FiSend, FiRefreshCw } from 'react-icons/fi';
 import { FaMicrophone } from 'react-icons/fa';
 import { COLORS } from '../utils/constants';
 import ErrorNotification from './ErrorNotification';
+import { useTranslation } from 'react-i18next';
 
 const InputArea = ({ 
   message, 
@@ -157,6 +158,7 @@ const InputArea = ({
   const [permissionError, setPermissionError] = useState(null);
   const textareaRef = useRef(null);
   const isLimitReached = conversations.length >= 25;
+  const { t } = useTranslation();
 
   const handleRecordingClick = async () => {
     if (isLimitReached) {
@@ -197,13 +199,13 @@ const InputArea = ({
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
       {isLimitReached && (
         <div className="mb-2 p-2 bg-blue-50 text-blue-800 rounded-md flex items-center justify-between text-sm">
-          <span>Limit reached (25 messages)</span>
+          <span>{t("Limit reached (25 messages)")}</span>
           <button 
             onClick={onNewSession}
             className="ml-2 px-3 py-1 bg-blue-100 hover:bg-blue-200 rounded-md transition-colors text-sm flex items-center gap-1"
           >
             <FiRefreshCw size={14} />
-            New Chat
+            {t("New Chat")}
           </button>
         </div>
       )}
@@ -225,7 +227,7 @@ const InputArea = ({
               }
             }}
             className="w-full border border-gray-300 rounded-l-lg p-2 pr-9 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400 resize-none text-sm"
-            placeholder={isRecording ? "Listening..." : isLimitReached ? "Press enter for new chat" : "Type your message..."}
+            placeholder={isRecording ? t("Listening...") : isLimitReached ? t("Press enter for new chat") : t("Type your message...")}
             rows="1"
             style={{
               minHeight: '40px',

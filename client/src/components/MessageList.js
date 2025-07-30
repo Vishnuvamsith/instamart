@@ -45,6 +45,7 @@ import MessageItem from './MessageItem';
 import WelcomeMessage from './WelcomeMessage';
 import LoadingIndicator from './LoadingIndicator';
 import EmptyConversation from './EmptyConversation';
+import SuggestionsButton from './SuggestionsButton';
 
 const MessageList = ({ 
   conversations, 
@@ -62,20 +63,23 @@ const MessageList = ({
       lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [conversations]);
+  const handleSuggestionClick = (text) => {
+    setMessage(text);
+    setTimeout(() => {
+      handleSubmit();
+    }, 100); // small delay to ensure state is updated
+  };
   
-  return (
-    <div className="p-4 space-y-6">
-      {showWelcome && <WelcomeMessage 
-          onSuggestionClick={(text) => {
-            setMessage(text);
-            handleSubmit(); // ✅ auto-submit
-          }} 
-        />} {/* ✅ fixed */}
+ return (
+  <div className="p-4 space-y-6 relative">
+    {showWelcome && (
+      <WelcomeMessage onSuggestionClick={handleSuggestionClick} />
+    )}
 
-      {conversations.length === 0 && !showWelcome ? (
-        <EmptyConversation />
-      ) : (
-        conversations
+    {conversations.length === 0 && !showWelcome ? (
+      <EmptyConversation />
+    ) : (
+      conversations
         .filter((message) => message.text && message.text.trim() !== '')
         .map((message, index, filteredMessages) => (
           <MessageItem 
@@ -88,12 +92,15 @@ const MessageList = ({
             lastMessageRef={lastMessageRef}
           />
         ))
-      
-      )}
-      
-      {loading && <LoadingIndicator />}
-    </div>
-  );
+    )}
+
+    {loading && <LoadingIndicator />}
+
+    {/* 💡 Floating Suggestions Button */}
+    <SuggestionsButton onSuggestionClick={handleSuggestionClick} />
+  </div>
+);
+
 };
 
 export default MessageList;
