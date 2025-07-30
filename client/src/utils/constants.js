@@ -5,7 +5,7 @@ export const COLORS = {
   };
   
   // export const API_URL = 'https://instamart-bq8h.onrender.com';
-  export const API_URL = 'http://127.0.0.1:5020';
+  export const API_URL = 'http://13.228.237.56:5020';
   export const ANSWER_ENDPOINT = `${API_URL}/api/dynamo/answer`;
   export const SESSIONS_ENDPOINT = `${API_URL}/api/sessions/ids-with-questions`;
   export const DELETE_SESSION_ENDPOINT = `${API_URL}/api/sessions`;
