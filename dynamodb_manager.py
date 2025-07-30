@@ -70,6 +70,7 @@ class DynamoDBManager:
 
     def _connect(self):
         try:
+            print(self.config.AWS_REGION)
             # No profile_name — rely on IAM role or environment credentials
             self.client = boto3.client("dynamodb", region_name=self.config.AWS_REGION)
             self.resource = boto3.resource("dynamodb", region_name=self.config.AWS_REGION)
