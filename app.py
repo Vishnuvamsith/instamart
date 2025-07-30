@@ -1606,4 +1606,4 @@ def add_mood():
 
 if __name__ == "__main__":
     dynamodb_manager._connect()
-    app.run(port=5020, debug=True)
+    app.run(host='0.0.0.0', port=5020, debug=True)
