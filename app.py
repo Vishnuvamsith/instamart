@@ -686,6 +686,7 @@ def upload_pdfs_to_s3():
 def login():
     try:
         data = request.get_json()
+        print(data)
         Phone_no = str(data.get('Phone_no'))
         
         if not Phone_no:
