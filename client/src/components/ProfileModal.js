@@ -112,7 +112,7 @@ const ProfileModal = ({ onClose }) => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const res = await fetch('http://127.0.0.1:5020/api/profile', {
+        const res = await fetch('http://13.228.237.56:5020/api/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

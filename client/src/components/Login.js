@@ -257,7 +257,7 @@ const Login = () => {
     setIsSubmitting(true);
     setError('');
     try {
-      const response = await axios.post('http://127.0.0.1:5020/api/auth/login', {
+      const response = await axios.post('http://13.228.237.56:5020/api/auth/login', {
         Phone_no: phoneNumber  // No need to convert to Number
       });
       

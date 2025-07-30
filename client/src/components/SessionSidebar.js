@@ -987,7 +987,7 @@ const SessionSidebar = ({
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('http://127.0.0.1:5020/api/profile', {
+        const response = await fetch('http://13.228.237.56:5020/api/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
